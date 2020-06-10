@@ -18,6 +18,7 @@
     "paths": {
       "app.constants": ["core/templates/app.constants"],
       "app-type.constants": ["core/templates/app-type.constants"],
+      "base-components/*": ["core/templates/base-components"],
       "components/*": ["core/templates/components/*"],
       "domain/*": ["core/templates/domain/*"],
       "expressions/*": ["core/templates/expressions/*"],
