@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +16,51 @@
  * @fileoverview The root component for angular application.
  */
 
+/**
+ * This file contains a component that "informs" the oppia-root directive that
+ * angular has finished loading. This also contains services to be added.
+ *
+ * To have a new angular service accesible in ajs do the following:
+ *   - import the service here.
+ *   - create a static variable with the name of the service class in camelCase.
+ *   - inject the service by providing it as an argument in the constructor.
+ *   - in the ngAfterViewInit assign the serivce to the static varible
+ *
+ * Example:
+ *   Let us assume that the service class is called MyService.
+ *   - First import the service.
+ *     import { MyService } from './path';
+ *   - Then we create a static variable with the name of the service class.
+ *     static myService: MyService;
+ *   - Then we add it to the constructor
+ *     constructor(
+ *      ...
+ *      private myService: MyService
+ *     ...) {}
+ *   - Then we assign the serivce to the static varible in ngAfterViewInit
+ *     ngAfterViewInit() {
+ *       ...
+ *       OppiaAngularRootComponent.myService = this.myService
+ *       ...
+ *     }
+ *
+ * In case the above explanation was not clear or case of doubts over what is
+ * done here, please look at the description of the PR #9479.
+ * https://github.com/oppia/oppia/pull/9479#issue-432536289
+ * You can also find this example there under the "How does it solve the
+ * Interceptor problem?" heading.
+ *
+ * File Structure:
+ *   1 - imports
+ *   2 - component declaration
+ *   3 - static declaration of service-variables
+ *   4 - constructor having all the services injected
+ *   5 - ngAfterViewInit function assigning the injected service to static class
+ *       variables and emitting an event to inform that angular has finished
+ *       loading
+ */
+
+/* eslint-disable max-len */
 import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
@@ -273,10 +317,8 @@ import { ParamTypeObjectFactory } from
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PencilCodeEditorValidationService } from
-  // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import { PlayerCorrectnessFeedbackEnabledService } from
-  // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
@@ -290,7 +332,6 @@ import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
-  // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
@@ -1246,7 +1287,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.workedExampleObjectFactory = this.workedExampleObjectFactory;
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
-    console.log('Hear here');
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }

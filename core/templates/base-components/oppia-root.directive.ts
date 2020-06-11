@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,64 +16,22 @@
  * @fileoverview The root directive of the oppia ajs application.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
+// In case of doubts over what is done here, please look at the description of
+// the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
+
 angular.module('oppia').directive('oppiaRoot', [
   function() {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
-      transclude: {
-        app: 'app',
-      },
+      transclude: true,
       controllerAs: '$ctrl',
       controller: ['$scope',
         function($scope) {
-          var start = Date.now();
           $scope.initialized = false;
 
           $scope.onInit = function() {
-            console.log(Date.now() - start);
-            angular.module('oppia').config(['$provide', function($provide) {
-              var servicesToProvide = [
-                'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
-                'CodeReplRulesService', 'CollectionCreationBackendService',
-                'CollectionCreationBackendService',
-                'ContextService', 'CreatorDashboardBackendApiService', 'CsrfTokenService',
-                'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
-                'DocumentAttributeCustomizationService',
-                'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
-                'ExpressionParserService', 'ExtensionTagAssemblerService',
-                'ExtractImageFilenamesFromStateService',
-                'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-                'InteractionRulesRegistryService', 'LanguageUtilService',
-                'LoaderService', 'LocalStorageService', 'LoggerService',
-                'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
-                'NormalizeWhitespacePunctuationAndCasePipe', 'PageTitleService',
-                'PencilCodeEditorRulesService', 'ProfilePageBackendApiService',
-                'RatingComputationService',
-                'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
-                'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
-                'SolutionObjectFactory', 'StateCardObjectFactory',
-                'StateImprovementSuggestionService', 'StateInteractionStatsService',
-                'StateObjectFactory', 'StatesObjectFactory', 'SuggestionsService',
-                'SuggestionThreadObjectFactory', 'TextInputRulesService',
-                'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
-                'ThreadStatusDisplayService', 'TranslationLanguageService',
-                'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
-                'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-                'WindowRef'];
-              for (let service of servicesToProvide) {
-              // console.log(service, (
-              //   service[0].toLowerCase() + service.substring(1)));
-                $provide.value(service, (
-                  service[0].toLowerCase() + service.substring(1)));
-                // angular.module('oppia').factory(service, function() {
-                //   return OppiaAngularRootComponent[service[0].toLowerCase() + service.substring(1)];
-                // });
-              }
-            }]);
-            console.log(Date.now() - start);
+            // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
           };
         }]

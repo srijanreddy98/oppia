@@ -35,17 +35,15 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
-import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
-
-
-
-console.log(OppiaAngularRootComponent);
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
+/* eslint-disable max-len */
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+/* eslint-enable max-len */
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -74,7 +72,6 @@ import { ObjectsDomainConstants } from
       useClass: RequestInterceptor,
       multi: true
     },
-    ProfilePageBackendApiService,
     CamelCaseToHyphensPipe,
     NormalizeWhitespacePipe,
     FormatTimePipe,

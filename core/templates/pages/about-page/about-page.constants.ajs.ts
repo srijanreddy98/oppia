@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the about page.
+ * @fileoverview Constants for the Oppia about page.
  */
 
-// The module needs to be loaded before everything else since it defines the
-// main module the elements are attached to.
-require('pages/about-page/about-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { AboutPageConstants } from 'pages/about-page/about-page.constants';
 
-require('pages/about-page/about-page.component.ts');
-require('base-components/base-content.directive.ts');
+angular.module('oppia').constant(
+  'CREDITS_CONSTANTS', AboutPageConstants.CREDITS_CONSTANTS);
