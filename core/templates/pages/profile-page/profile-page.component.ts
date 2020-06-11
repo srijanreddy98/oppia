@@ -31,8 +31,6 @@ require('pages/profile-page/profile-page-backend-api.service');
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
-import { ProfilePageModule } from './profile-page.module';
 
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
@@ -40,12 +38,13 @@ angular.module('oppia').component('profilePage', {
     '$http', '$log', '$window',
     'DateTimeFormatService', 'LoaderService',
     'UrlInterpolationService', 'UserService',
+    'ProfilePageBackendApiService',
     function($http, $log, $window,
         DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UserService) {
+        UrlInterpolationService, UserService,
+        ProfilePageBackendApiService) {
       var ctrl = this;
-      // ctrl.profilePageBackendApiService = ProfilePageModule.injector.get(ProfilePageBackendApiService);
-      ctrl.profilePageBackendApiService = OppiaAngularRootComponent.profilePageBackendApiService;
+      ProfilePageBackendApiService = OppiaAngularRootComponent.profilePageBackendApiService;
       var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
         .getStaticImageUrl('/general/no_profile_picture.png');
 
@@ -55,7 +54,7 @@ angular.module('oppia').component('profilePage', {
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading');
         let fetchProfileData = () =>
-          ctrl.profilePageBackendApiService.fetchProfileData();
+          ProfilePageBackendApiService.fetchProfileData();
         fetchProfileData().then(function(data) {
           LoaderService.hideLoadingScreen();
           ctrl.username = {
@@ -126,13 +125,11 @@ angular.module('oppia').component('profilePage', {
               );
             } else {
               if (!ctrl.isAlreadySubscribed) {
-                ctrl.profilePageBackendApiService.subscribe(
-                  data.profile_username).then(
-                  () => ctrl.isAlreadySubscribed = true);
+                ProfilePageBackendApiService.subscribe(data.profile_username)
+                  .then(() => ctrl.isAlreadySubscribed = true);
               } else {
-                ctrl.profilePageBackendApiService.unsubscribe(
-                  data.profile_username).then(
-                  () => ctrl.isAlreadySubscribed = false);
+                ProfilePageBackendApiService.unsubscribe(data.profile_username)
+                  .then(() => ctrl.isAlreadySubscribed = false);
               }
               ctrl.updateSubscriptionButtonPopoverText();
             }
