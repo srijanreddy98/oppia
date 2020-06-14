@@ -26,13 +26,15 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AboutPageComponent } from './about-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+<<<<<<< HEAD
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -45,6 +47,10 @@ import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
+=======
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+>>>>>>> upstream/develop
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -60,9 +66,11 @@ import { AboutPageConstants } from 'pages/about-page/about-page.constants';
     SharedComponentsModule
   ],
   declarations: [
+    AboutPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    AboutPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [
