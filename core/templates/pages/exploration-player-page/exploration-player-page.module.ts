@@ -79,11 +79,7 @@ import { ExplorationPlayerConstants } from
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
       multi: true
-    },
-    CamelCaseToHyphensPipe,
-    NormalizeWhitespacePipe,
-    FormatTimePipe,
-    NormalizeWhitespacePunctuationAndCasePipe
+    }
   ]
 })
 class ExplorationPlayerPageModule {

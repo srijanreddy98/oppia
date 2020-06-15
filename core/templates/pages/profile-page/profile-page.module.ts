@@ -62,11 +62,7 @@ import { ObjectsDomainConstants } from
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
       multi: true
-    },
-    CamelCaseToHyphensPipe,
-    NormalizeWhitespacePipe,
-    FormatTimePipe,
-    NormalizeWhitespacePunctuationAndCasePipe
+    }
   ]
 })
 export class ProfilePageModule {
