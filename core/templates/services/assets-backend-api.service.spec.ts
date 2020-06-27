@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
+/*
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
@@ -25,7 +26,17 @@ import { FileDownloadRequestObjectFactory } from
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+*/
 // ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { AssetsBackendApiService } from
+  'services/assets-backend-api.service';
+import { AppConstants } from 'app.constants';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from
+  '@angular/core/testing';
+
 // Jquery is needed in this file because some tests will spyOn Jquery methods.
 // The spies won't actually spy Jquery methods without the import.
 import $ from 'jquery';
@@ -33,9 +44,11 @@ import $ from 'jquery';
 require('domain/utilities/url-interpolation.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/csrf-token.service.ts');
+const Constants = require('constants.ts');
 
-describe('Assets Backend API Service', function() {
-  describe('on dev mode', function() {
+describe('Assets Backend API Service', () => {
+  describe('on dev mode', () => {
+    /*
     var AssetsBackendApiService = null;
     var fileDownloadRequestObjectFactory = null;
     var UrlInterpolationService = null;
@@ -46,9 +59,43 @@ describe('Assets Backend API Service', function() {
     var $rootScope = null;
     var $q = null;
     var ENTITY_TYPE = null;
+    */
+    var serviceInstance = null;
+    var httpTestingController = null;
+    var ENTITY_TYPE = null;
     var audioRequestUrl = null;
     var imageRequestUrl = null;
+    const EXAMPLE_AUDIO = new Blob(['audio data'], {type: 'audioType'});
 
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+      });
+      httpTestingController = TestBed.get(HttpTestingController);
+      serviceInstance = TestBed.get(AssetsBackendApiService);
+      ENTITY_TYPE = AppConstants.ENTITY_TYPE;
+      audioRequestUrl = serviceInstance.urlInterpolationService.interpolateUrl(
+        '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
+        '<filename>',
+        {
+          exploration_id: '0',
+          filename: 'myfile.mp3'
+        });
+
+      imageRequestUrl = serviceInstance.urlInterpolationService.interpolateUrl(
+        '/assetsdevhandler/exploration/<exploration_id>/assets/image/' +
+        '<filename>',
+        {
+          exploration_id: '0',
+          filename: 'myfile.png'
+        });
+    });
+
+    afterEach(() => {
+      httpTestingController.verify();
+    });
+
+    /*
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
@@ -103,120 +150,154 @@ describe('Assets Backend API Service', function() {
         });
     }));
 
-    afterEach(function() {
+    afterEach(() => {
       $httpBackend.verifyNoOutstandingRequest();
     });
+    */
 
-    it('should correctly formulate the download URL for audio', function() {
+    it('should correctly formulate the download URL for audio', () => {
       expect(
-        AssetsBackendApiService.getAudioDownloadUrl(
+        serviceInstance.getAudioDownloadUrl(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
       ).toEqual('/assetsdevhandler/exploration/expid12345/assets/audio/a.mp3');
     });
 
-    it('should correctly formulate the preview URL for images', function() {
+    it('should correctly formulate the preview URL for images', () => {
       expect(
-        AssetsBackendApiService.getImageUrlForPreview(
+        serviceInstance.getImageUrlForPreview(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.png')
       ).toEqual('/assetsdevhandler/exploration/expid12345/assets/image/a.png');
     });
 
-    it('should correctly formulate the thumbnail url for preview', function() {
+    it('should correctly formulate the thumbnail url for preview', () => {
       expect(
-        AssetsBackendApiService.getThumbnailUrlForPreview(
+        serviceInstance.getThumbnailUrlForPreview(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'thumbnail.png')).toEqual(
         '/assetsdevhandler/exploration/expid12345/assets/' +
         'thumbnail/thumbnail.png');
     });
 
-    it('should successfully fetch and cache audio', function() {
+    it('should successfully fetch and cache audio', fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+      //$httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
+      expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
 
 
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      var req = httpTestingController.expectOne(audioRequestUrl);
+      expect(req.request.method).toEqual('GET');
+      expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(1);
-      $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      req.flush(EXAMPLE_AUDIO);
+      //$httpBackend.flush();
+      flushMicrotasks();
+      expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(0);
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(true);
+      expect(serviceInstance.isCached('myfile.mp3')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
+      //$httpBackend.verifyNoOutstandingExpectation();
+    }));
 
-    it('should not fetch an audio if it is already cached', function() {
+    it('should not fetch an audio if it is already cached', fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      //$httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
+      expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
+      serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      $httpBackend.flush();
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(true);
+      var req = httpTestingController.expectOne(audioRequestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(EXAMPLE_AUDIO);
+      //$httpBackend.flush();
+      flushMicrotasks();
+      expect(serviceInstance.isCached('myfile.mp3')).toBe(true);
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      $httpBackend.verifyNoOutstandingExpectation();
+      //$httpBackend.verifyNoOutstandingExpectation();
 
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        function(cachedFile) {
-          expect(cachedFile).toEqual(audioFileObjectFactory.createNew(
-            'myfile.mp3',
-            new Blob()
-          ));
+      serviceInstance.loadAudio('0', 'myfile.mp3').then(
+        (cachedFile) => {
+          expect(cachedFile).toEqual(
+            serviceInstance.audioFileObjectFactory.createNew(
+              'myfile.mp3',
+              EXAMPLE_AUDIO
+            )
+          );
         });
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
+      //$httpBackend.verifyNoOutstandingExpectation();
+    }));
 
-    it('should handler rejection when fetching a file fails', function() {
+    // TODO Remove this DEBUG code
+    fit('should DEBUG', fakeAsync(() => {
+      serviceInstance.debug();
+      var req = httpTestingController.expectOne('/debug');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        'File not found.',
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      )
+    }));
+
+    it('should handler rejection when fetching a file fails', fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', audioRequestUrl).respond(
-        500, 'File not found.');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+      //$httpBackend.expect('GET', audioRequestUrl).respond(
+      //  500, 'File not found.');
+      expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
 
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(audioRequestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        'File not found.',
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      )
+      //$httpBackend.flush();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
+      expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
+      //$httpBackend.verifyNoOutstandingExpectation();
+    }));
 
-    it('should successfully save an audio', function(done) {
+    it('should successfully save an audio', (done) => {
       var successMessage = 'Audio was successfully saved.';
       // @ts-ignore in order to ignore JQuery properties that should
       // be declarated.
-      spyOn($, 'ajax').and.callFake(function() {
+      spyOn($, 'ajax').and.callFake(() => {
         var d = $.Deferred();
         d.resolve(successMessage);
         return d.promise();
       });
 
-      AssetsBackendApiService.saveAudio('0', 'a.mp3', new File([], 'a.mp3'))
-        .then(function(response) {
+      serviceInstance.saveAudio('0', 'a.mp3', new File([], 'a.mp3'))
+        .then((response) => {
           expect(response).toBe(successMessage);
         }).then(done, done.fail);
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
       // which is what $apply helps kick-start.
-      $rootScope.$apply();
+      //$rootScope.$apply();
     });
 
-    it('should handle rejection when saving a file fails', function(done) {
+    it('should handle rejection when saving a file fails', (done) => {
       var errorMessage = 'Error on saving audio';
       // @ts-ignore in order to ignore JQuery properties that should
       // be declarated.
-      spyOn($, 'ajax').and.callFake(function() {
+      spyOn($, 'ajax').and.callFake(() => {
         var d = $.Deferred();
         d.reject({
           // responseText contains a XSSI Prefix, which is represented by )]}'
@@ -230,8 +311,8 @@ describe('Assets Backend API Service', function() {
         return d.promise();
       });
 
-      AssetsBackendApiService.saveAudio('0', 'a.mp3', new File([], 'a.mp3'))
-        .then(done, function(response) {
+      serviceInstance.saveAudio('0', 'a.mp3', new File([], 'a.mp3'))
+        .then(done, (response) => {
           expect(response).toEqual({
             message: errorMessage
           });
@@ -240,49 +321,49 @@ describe('Assets Backend API Service', function() {
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
       // which is what $apply helps kick-start.
-      $rootScope.$apply();
+      //$rootScope.$apply();
     });
 
-    it('should successfully fetch and cache image', function() {
+    it('should successfully fetch and cache image', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', imageRequestUrl).respond(201, 'image data');
-      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
+      expect(serviceInstance.isCached('myfile.png')).toBe(false);
 
-      AssetsBackendApiService.loadImage(
+      serviceInstance.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .image.length).toBe(1);
       $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .image.length).toBe(0);
-      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(true);
+      expect(serviceInstance.isCached('myfile.png')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
-    it('should not fetch an image if it is already cached', function() {
+    it('should not fetch an image if it is already cached', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', imageRequestUrl).respond(201, 'image data');
-      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
+      expect(serviceInstance.isCached('myfile.png')).toBe(false);
 
-      AssetsBackendApiService.loadImage(
+      serviceInstance.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
       $httpBackend.flush();
-      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(true);
+      expect(serviceInstance.isCached('myfile.png')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
       $httpBackend.verifyNoOutstandingExpectation();
 
-      AssetsBackendApiService.loadImage(
+      serviceInstance.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
-        function(cachedFile) {
+        (cachedFile) => {
           expect(cachedFile).toEqual(imageFileObjectFactory.createNew(
             'myfile.png',
             new Blob()
@@ -292,13 +373,13 @@ describe('Assets Backend API Service', function() {
     });
 
     it('should call the provided failure handler on HTTP failure for an audio',
-      function() {
+      () => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
         $httpBackend.expect('GET', audioRequestUrl).respond(
           500, 'MutagenError');
-        AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+        serviceInstance.loadAudio('0', 'myfile.mp3').then(
           successHandler, failHandler);
         $httpBackend.flush();
 
@@ -308,12 +389,12 @@ describe('Assets Backend API Service', function() {
       });
 
     it('should call the provided failure handler on HTTP failure for an image',
-      function() {
+      () => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
         $httpBackend.expect('GET', imageRequestUrl).respond(500, 'Error');
-        AssetsBackendApiService.loadImage(
+        serviceInstance.loadImage(
           ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
           successHandler, failHandler);
         $httpBackend.flush();
@@ -324,58 +405,58 @@ describe('Assets Backend API Service', function() {
       });
 
     it('should successfully abort the download of all the audio files',
-      function() {
+      () => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
         $httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
 
-        AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+        serviceInstance.loadAudio('0', 'myfile.mp3').then(
           successHandler, failHandler);
 
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(serviceInstance.getAssetsFilesCurrentlyBeingRequested()
           .audio.length).toBe(1);
 
-        AssetsBackendApiService.abortAllCurrentAudioDownloads();
+        serviceInstance.abortAllCurrentAudioDownloads();
         $httpBackend.verifyNoOutstandingRequest();
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(serviceInstance.getAssetsFilesCurrentlyBeingRequested()
           .audio.length).toBe(0);
-        expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+        expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
       });
 
     it('should successfully abort the download of the all the image files',
-      function() {
+      () => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
         $httpBackend.expect('GET', imageRequestUrl).respond(201, 'image data');
 
-        AssetsBackendApiService.loadImage(
+        serviceInstance.loadImage(
           ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
           successHandler, failHandler);
 
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(serviceInstance.getAssetsFilesCurrentlyBeingRequested()
           .image.length).toBe(1);
 
-        AssetsBackendApiService.abortAllCurrentImageDownloads();
+        serviceInstance.abortAllCurrentImageDownloads();
         $httpBackend.verifyNoOutstandingRequest();
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(serviceInstance.getAssetsFilesCurrentlyBeingRequested()
           .image.length).toBe(0);
-        expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
+        expect(serviceInstance.isCached('myfile.png')).toBe(false);
       });
 
-    it('should use the correct blob type for audio assets', function() {
+    it('should use the correct blob type for audio assets', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', audioRequestUrl).respond(
         201, {type: 'audio/mpeg'});
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(1);
       $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(0);
 
       expect(successHandler).toHaveBeenCalled();
@@ -385,9 +466,9 @@ describe('Assets Backend API Service', function() {
     });
   });
 
-  describe('without dev mode settings', function() {
+  describe('without dev mode settings', () => {
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', ($provide) => {
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
@@ -396,7 +477,7 @@ describe('Assets Backend API Service', function() {
       $provide.constant('DEV_MODE', false);
       $provide.constant('GCS_RESOURCE_BUCKET_NAME', false);
     }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', ($provide) => {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
@@ -405,62 +486,65 @@ describe('Assets Backend API Service', function() {
 
     it('should throw an error when is not on dev mode and Google Cloud' +
       ' Service bucket name is not set', angular.mock.inject(
-      function($injector) {
-        expect(function() {
+      ($injector) => {
+        expect(() => {
           var service = $injector.get(
             'AssetsBackendApiService');
         }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
       }));
   });
 
-  describe('on production mode', function() {
-    var AssetsBackendApiService = null;
+  describe('on production mode', () => {
+    var serviceInstance = null;
+    var httpTestingController = null;
     var ENTITY_TYPE = null;
     var gcsPrefix = 'https://storage.googleapis.com/None-resources';
+    var oldDevMode = null
 
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
-      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
-      $provide.constant('DEV_MODE', false);
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    }));
+    beforeAll(() => {
+      oldDevMode = Constants.DEV_MODE
+      Constants.DEV_MODE = false;
+    });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      AssetsBackendApiService = $injector.get(
-        'AssetsBackendApiService');
-      ENTITY_TYPE = $injector.get('ENTITY_TYPE');
-    }));
+    afterAll(() => {
+      Constants.DEV_MODE = oldDevMode;
+    });
 
-    it('should correctly formulate the download URL for audios', function() {
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        providers: [AssetsBackendApiService]
+      });
+      httpTestingController = TestBed.get(HttpTestingController);
+      serviceInstance = TestBed.get(AssetsBackendApiService);
+      ENTITY_TYPE = AppConstants.ENTITY_TYPE;
+    });
+
+    it('should correctly formulate the download URL for audios', () => {
       expect(
-        AssetsBackendApiService.getAudioDownloadUrl(
+        serviceInstance.getAudioDownloadUrl(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
       ).toEqual(gcsPrefix +
         '/exploration/expid12345/assets/audio/a.mp3');
     });
 
-    it('should correctly formulate the preview URL for images', function() {
+    it('should correctly formulate the preview URL for images', () => {
       expect(
-        AssetsBackendApiService.getImageUrlForPreview(
+        serviceInstance.getImageUrlForPreview(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.png')
       ).toEqual(gcsPrefix + '/exploration/expid12345/assets/image/a.png');
     });
 
-    it('should correctly formulate the thumbnail url for preview', function() {
+    it('should correctly formulate the thumbnail url for preview', () => {
       expect(
-        AssetsBackendApiService.getThumbnailUrlForPreview(
+        serviceInstance.getThumbnailUrlForPreview(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'thumbnail.png')
       ).toEqual(gcsPrefix +
         '/exploration/expid12345/assets/thumbnail/thumbnail.png');
+    });
+
+    afterEach(() => {
+      httpTestingController.verify();
     });
   });
 });
