@@ -18,12 +18,13 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Observable, Subscription } from 'rxjs';
 
-export class FileDownloadRequest {
+export class FileDownloadRequestObject {
   filename: string;
-  subscription: Observable;
+  subscription: Subscription;
 
-  constructor(filename: string, subscription: Observable) {
+  constructor(filename: string, subscription: Subscription) {
     this.filename = filename;
     this.subscription = subscription;
   }
@@ -33,8 +34,9 @@ export class FileDownloadRequest {
   providedIn: 'root'
 })
 export class FileDownloadRequestObjectFactory {
-  createNew(filename: string, subscription: Observable): FileDownloadRequest {
-    return new FileDownloadRequest(filename, subscription);
+  createNew(
+      filename: string, subscription: Subscription): FileDownloadRequestObject {
+    return new FileDownloadRequestObject(filename, subscription);
   }
 }
 angular.module('oppia').factory(

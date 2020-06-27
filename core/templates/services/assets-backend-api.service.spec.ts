@@ -18,7 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
-/*
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
@@ -26,9 +25,7 @@ import { FileDownloadRequestObjectFactory } from
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-*/
 // ^^^ This block is to be removed.
-import { TestBed } from '@angular/core/testing';
 import { AssetsBackendApiService } from
   'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
@@ -46,20 +43,8 @@ require('services/assets-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 const Constants = require('constants.ts');
 
-describe('Assets Backend API Service', () => {
-  describe('on dev mode', () => {
-    /*
-    var AssetsBackendApiService = null;
-    var fileDownloadRequestObjectFactory = null;
-    var UrlInterpolationService = null;
-    var audioFileObjectFactory = null;
-    var imageFileObjectFactory = null;
-    var CsrfService = null;
-    var $httpBackend = null;
-    var $rootScope = null;
-    var $q = null;
-    var ENTITY_TYPE = null;
-    */
+fdescribe('Assets Backend API Service', () => {
+  fdescribe('on dev mode', () => {
     var serviceInstance = null;
     var httpTestingController = null;
     var ENTITY_TYPE = null;
@@ -95,65 +80,6 @@ describe('Assets Backend API Service', () => {
       httpTestingController.verify();
     });
 
-    /*
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
-      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    }));
-
-    beforeEach(angular.mock.inject(function($injector) {
-      AssetsBackendApiService = $injector.get(
-        'AssetsBackendApiService');
-      fileDownloadRequestObjectFactory = $injector.get(
-        'FileDownloadRequestObjectFactory');
-      audioFileObjectFactory = $injector.get('AudioFileObjectFactory');
-      imageFileObjectFactory = $injector.get('ImageFileObjectFactory');
-      UrlInterpolationService = $injector.get(
-        'UrlInterpolationService');
-      $httpBackend = $injector.get('$httpBackend');
-      $rootScope = $injector.get('$rootScope');
-      ENTITY_TYPE = $injector.get('ENTITY_TYPE');
-      $q = $injector.get('$q');
-
-      CsrfService = $injector.get('CsrfTokenService');
-
-      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve('sample-csrf-token');
-        return deferred.promise;
-      });
-
-      audioRequestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
-        '<filename>',
-        {
-          exploration_id: '0',
-          filename: 'myfile.mp3'
-        });
-
-      imageRequestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/exploration/<exploration_id>/assets/image/' +
-        '<filename>',
-        {
-          exploration_id: '0',
-          filename: 'myfile.png'
-        });
-    }));
-
-    afterEach(() => {
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-    */
 
     it('should correctly formulate the download URL for audio', () => {
       expect(
@@ -177,13 +103,11 @@ describe('Assets Backend API Service', () => {
         'thumbnail/thumbnail.png');
     });
 
-    it('should successfully fetch and cache audio', fakeAsync(() => {
+    fit('should successfully fetch and cache audio', fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-
-      //$httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
+      // $httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
-
 
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
@@ -192,34 +116,33 @@ describe('Assets Backend API Service', () => {
       expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(1);
       req.flush(EXAMPLE_AUDIO);
-      //$httpBackend.flush();
+      // $httpBackend.flush();
       flushMicrotasks();
       expect((serviceInstance.getAssetsFilesCurrentlyBeingRequested())
         .audio.length).toBe(0);
       expect(serviceInstance.isCached('myfile.mp3')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      //$httpBackend.verifyNoOutstandingExpectation();
+      // $httpBackend.verifyNoOutstandingExpectation();
     }));
 
     it('should not fetch an audio if it is already cached', fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      //$httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
+      // $httpBackend.expect('GET', audioRequestUrl).respond(201, 'audio data');
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
       req.flush(EXAMPLE_AUDIO);
-      //$httpBackend.flush();
+      // $httpBackend.flush();
       flushMicrotasks();
       expect(serviceInstance.isCached('myfile.mp3')).toBe(true);
-
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      //$httpBackend.verifyNoOutstandingExpectation();
+      // $httpBackend.verifyNoOutstandingExpectation();
 
       serviceInstance.loadAudio('0', 'myfile.mp3').then(
         (cachedFile) => {
@@ -230,7 +153,7 @@ describe('Assets Backend API Service', () => {
             )
           );
         });
-      //$httpBackend.verifyNoOutstandingExpectation();
+      // $httpBackend.verifyNoOutstandingExpectation();
     }));
 
     // TODO Remove this DEBUG code
@@ -238,20 +161,14 @@ describe('Assets Backend API Service', () => {
       serviceInstance.debug();
       var req = httpTestingController.expectOne('/debug');
       expect(req.request.method).toEqual('GET');
-      req.flush(
-        'File not found.',
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      )
+      req.error();
     }));
 
     it('should handler rejection when fetching a file fails', fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      //$httpBackend.expect('GET', audioRequestUrl).respond(
+      // $httpBackend.expect('GET', audioRequestUrl).respond(
       //  500, 'File not found.');
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
 
@@ -265,12 +182,12 @@ describe('Assets Backend API Service', () => {
           status: 500,
           statusText: 'Internal Server Error',
         }
-      )
-      //$httpBackend.flush();
+      );
+      // $httpBackend.flush();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
       expect(serviceInstance.isCached('myfile.mp3')).toBe(false);
-      //$httpBackend.verifyNoOutstandingExpectation();
+      // $httpBackend.verifyNoOutstandingExpectation();
     }));
 
     it('should successfully save an audio', (done) => {
@@ -290,7 +207,7 @@ describe('Assets Backend API Service', () => {
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
       // which is what $apply helps kick-start.
-      //$rootScope.$apply();
+      // $rootScope.$apply();
     });
 
     it('should handle rejection when saving a file fails', (done) => {
@@ -321,7 +238,7 @@ describe('Assets Backend API Service', () => {
 
       // $q Promises need to be forcibly resolved through a JavaScript digest,
       // which is what $apply helps kick-start.
-      //$rootScope.$apply();
+      // $rootScope.$apply();
     });
 
     it('should successfully fetch and cache image', () => {
@@ -499,10 +416,10 @@ describe('Assets Backend API Service', () => {
     var httpTestingController = null;
     var ENTITY_TYPE = null;
     var gcsPrefix = 'https://storage.googleapis.com/None-resources';
-    var oldDevMode = null
+    var oldDevMode = null;
 
     beforeAll(() => {
-      oldDevMode = Constants.DEV_MODE
+      oldDevMode = Constants.DEV_MODE;
       Constants.DEV_MODE = false;
     });
 

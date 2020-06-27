@@ -30,7 +30,7 @@ import { ImageFileObjectFactory } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { AppConstants } from 'app.constants';  // For ENTITY_TYPE
+import { AppConstants } from 'app.constants'; // For ENTITY_TYPE
 
 require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
@@ -50,6 +50,14 @@ interface PendingRequestsType {
   providedIn: 'root'
 })
 export class AssetsBackendApiService {
+  ASSET_TYPE_AUDIO: string;
+  ASSET_TYPE_IMAGE: string;
+  ASSET_TYPE_THUMBNAIL: string;
+  _audioFilesCurrentlyBeingRequested: any[];
+  _imageFilesCurrentlyBeingRequested: any[];
+  AUDIO_UPLOAD_URL_TEMPLATE: string;
+  ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE: { [x: string]: string; };
+  assetsCache: {};
   constructor(
     private http: HttpClient,
     private audioFileObjectFactory: AudioFileObjectFactory,
@@ -58,7 +66,7 @@ export class AssetsBackendApiService {
       FileDownloadRequestObjectFactory,
     private imageFileObjectFactory: ImageFileObjectFactory,
     private urlInterpolationService: UrlInterpolationService
-  ): void {
+  ) {
     if (!Constants.DEV_MODE && !Constants.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
@@ -131,7 +139,6 @@ export class AssetsBackendApiService {
       response => {
         console.log('DEBUG: Response:');
         console.log(response);
-        /*
         if (response.status < 200 || response.status > 299) {
           errorCallback(filename);
           this._removeFromFilesCurrentlyBeingRequested(filename, assetType);
@@ -148,15 +155,12 @@ export class AssetsBackendApiService {
             this.imageFileObjectFactory.createNew(filename, assetBlob));
         }
         this._removeFromFilesCurrentlyBeingRequested(filename, assetType);
-        */
       },
       err => {
         console.log('DEBUG: Error:');
         console.log(err);
-        /*
         errorCallback(filename);
         this._removeFromFilesCurrentlyBeingRequested(filename, assetType);
-        */
       }
     );
     if (assetType === this.ASSET_TYPE_AUDIO) {
@@ -176,7 +180,7 @@ export class AssetsBackendApiService {
   private _removeXSSIPrefix(data: string) {
     var transformedData = data.substring(5);
     var parsedResponse = JSON.parse(transformedData);
-    console.log(typeof(parsedResponse));
+    console.log(typeof (parsedResponse));
     return parsedResponse;
   }
 
@@ -195,7 +199,7 @@ export class AssetsBackendApiService {
   }
 
   private _removeFromFilesCurrentlyBeingRequested(
-    filename: string, assetType: string
+      filename: string, assetType: string
   ): void {
     if (this._isAssetCurrentlyBeingRequested(filename, this.ASSET_TYPE_AUDIO)) {
       for (var index = 0; index <
@@ -255,10 +259,10 @@ export class AssetsBackendApiService {
   }
 
   private _getDownloadUrl(
-    entityType: string,
-    entityId: string,
-    filename: string,
-    assetType: string
+      entityType: string,
+      entityId: string,
+      filename: string,
+      assetType: string
   ): string {
     var urlTemplate = null;
     urlTemplate = this.ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
@@ -278,7 +282,7 @@ export class AssetsBackendApiService {
   }
 
   private _isAssetCurrentlyBeingRequested(
-    filename: string, assetType: string
+      filename: string, assetType: string
   ): boolean {
     if (assetType === this.ASSET_TYPE_AUDIO) {
       return this._audioFilesCurrentlyBeingRequested.some(function(request) {
@@ -295,7 +299,7 @@ export class AssetsBackendApiService {
     return this.assetsCache.hasOwnProperty(filename);
   }
 
-  loadAudio(explorationId: string, filename: string): void {
+  loadAudio(explorationId: string, filename: string): Promise<any> {
     return new Promise((resolve, reject) => {
       if (this._isCached(filename)) {
         resolve(this.audioFileObjectFactory.createNew(
@@ -309,7 +313,7 @@ export class AssetsBackendApiService {
   }
 
   loadImage(
-    entityType: string, entityId: string, filename: string
+      entityType: string, entityId: string, filename: string
   ): Promise {
     return new Promise((resolve, reject) => {
       if (this._isCached(filename)) {
@@ -324,8 +328,8 @@ export class AssetsBackendApiService {
 
   // TODO: Figure out type of rawAssetData
   saveAudio(
-    explorationId: string, filename: string, rawAssetData
-  ): Promise {
+      explorationId: string, filename: string, rawAssetData
+  ): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._saveAudio(explorationId, filename, rawAssetData, resolve, reject);
     });
@@ -336,7 +340,7 @@ export class AssetsBackendApiService {
   }
 
   getAudioDownloadUrl(
-    entityType: string, entityId: string, filename: string
+      entityType: string, entityId: string, filename: string
   ): string {
     return this._getDownloadUrl(
       entityType, entityId, filename, this.ASSET_TYPE_AUDIO);
@@ -358,14 +362,14 @@ export class AssetsBackendApiService {
   }
 
   getImageUrlForPreview(
-    entityType: string, entityId: string, filename: string
+      entityType: string, entityId: string, filename: string
   ): string {
     return this._getDownloadUrl(
       entityType, entityId, filename, this.ASSET_TYPE_IMAGE);
   }
 
   getThumbnailUrlForPreview(
-    entityType: string, entityId: string, filename: string
+      entityType: string, entityId: string, filename: string
   ): string {
     return this._getDownloadUrl(
       entityType, entityId, filename, this.ASSET_TYPE_THUMBNAIL);
