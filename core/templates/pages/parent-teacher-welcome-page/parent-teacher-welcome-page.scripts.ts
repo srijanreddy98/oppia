@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the Parents and Teachers welcome guide page.
+ * @fileoverview Scripts for the Oppia splash page.
  */
 
 // The module needs to be loaded before everything else since it defines the
@@ -22,6 +22,6 @@ require(
   'pages/parent-teacher-welcome-page/parent-teacher-welcome-page.module.ts');
 require('App.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/oppia-root.directive.ts');
 require(
   'pages/parent-teacher-welcome-page/parent-teacher-welcome-page.component.ts');

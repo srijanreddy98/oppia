@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the Parents and Teachers Welcome Guide page.
+ * @fileoverview Component for the Oppia splash page.
  */
+
+require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').component('parentTeacherWelcomePage', {
-  template: require('./parent-teacher-welcome-page.mainpage.html'),
+  template: require('./parent-teacher-welcome-page.component.html'),
   controller: ['UrlInterpolationService',
     function(UrlInterpolationService) {
       var ctrl = this;
@@ -61,5 +63,7 @@ angular.module('oppia').component('parentTeacherWelcomePage', {
           UrlInterpolationService.getStaticImageUrl(
             '/parent_teacher_welcome_page/exploration_library.webp'));
       };
-    }]
+    }
+  ]
 });
+

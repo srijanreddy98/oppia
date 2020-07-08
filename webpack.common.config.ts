@@ -105,7 +105,7 @@ module.exports = {
       'notifications-dashboard-page.scripts.ts',
     parent_teacher_welcome_page:
       commonPrefix + '/pages/parent-teacher-welcome-page/parent-teacher-' +
-        'welcome-guide-page.scripts.ts',
+        'welcome-page.scripts.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.scripts.ts',
