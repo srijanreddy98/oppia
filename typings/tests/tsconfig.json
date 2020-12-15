@@ -4,7 +4,8 @@
 {
   "compilerOptions": {
     "lib": ["es2017", "dom", "webworker"],
-    "target": "es5",
+    "target": "es6",
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": false,
@@ -14,6 +15,7 @@
     "experimentalDecorators": true,
     "paths": {
       "app.constants": ["../../core/templates/app.constants"],
+      "assets/constants": ["../../assets/constants.ts"],
       "app-type.constants": ["../../core/templates/app-type.constants"],
       "components/*": ["../../core/templates/components/*"],
       "domain/*": ["../../core/templates/domain/*"],
