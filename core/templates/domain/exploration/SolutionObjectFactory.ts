@@ -37,6 +37,7 @@ import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import {
+  DragAndDropAnswer,
   FractionAnswer,
   InteractionAnswer,
   LogicProofAnswer,
@@ -110,7 +111,7 @@ export class Solution {
     } else if (interactionId === 'DragAndDropSortInput') {
       let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];
-      for (let arr of this.correctAnswer) {
+      for (let arr of this.correctAnswer as DragAndDropAnswer) {
         let transformedArray = [];
         for (let elem of arr) {
           transformedArray.push(formatRtePreview.transform(elem));
