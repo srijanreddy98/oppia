@@ -143,6 +143,7 @@ export class AnswerClassificationService {
         if (!answerGroup.trainingData) {
           continue;
         }
+        // @ts-ignore
         for (const trainingDatum of answerGroup.trainingData) {
           if (angular.equals(answer, trainingDatum)) {
             return new AnswerClassificationResult(
